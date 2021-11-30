@@ -5,7 +5,7 @@ import random
 # List of activation functions  
 
 def sigmoid(x):
-    return 1/1+np.exp(-1)
+    return 1/(1+np.exp(-1)) 
 
 def sigmoid_derivative(x):
     return sigmoid(x)*(1-sigmoid(x))
@@ -46,7 +46,7 @@ independent_variable = []
 # X = sales_time[predictor].values
 # Y = sales_time[target].values   
 
-dataset = pd.read_csv(r'C:\Users\ABC\Documents\fall 2021\AI\Project\updated_dataset.csv')
+dataset = pd.read_csv('updated_dataset.csv')
 
 #print('target')
 target = pd.DataFrame(dataset, columns= ['Class'])
@@ -67,7 +67,7 @@ weights = np.random.rand(9,1)
 bias = np.random.rand(1)
 lr = 0.05 #learning rate
 errors = [] 
-for epoch in range(1000):
+for epoch in range(25000):
     inputs = input_set
     XW = np.dot(inputs, weights)+ bias
     z = sigmoid(XW)
@@ -78,8 +78,11 @@ for epoch in range(1000):
     dpred = sigmoid_derivative(z)
     z_del = dcost * dpred
     inputs = input_set.T
+    # print(weights)
+    # print('\n')
     weights = weights - lr*np.dot(inputs, z_del)
-    
+    # print(weights)
+    # print('\n')
     for num in z_del:
         bias = bias - lr*num
 
