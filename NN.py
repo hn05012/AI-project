@@ -77,7 +77,7 @@ weight_output = np.array(weight_output)
 def train(train_X, training_labels, weight_hidden, weight_output, epoch):
     lr = 0.01
     bias = 0
-    w = {'w_hidden': weight_hidden, 'w_output':weight_output}
+    w = {'w_hidden': weight_hidden, 'w_output':weight_output,'error':[], 'iterations':[]} 
     for i in range(epoch):
         # input for hidden layer
         input_hidden = np.dot(train_X, weight_hidden) + bias
@@ -92,6 +92,8 @@ def train(train_X, training_labels, weight_hidden, weight_output, epoch):
         output_op = sigmoid(input_op)
 
         error_out = ((1/2)*(np.power( (output_op - training_labels), 2 )))
+        w['error'].append(float(error_out.sum())/len(error_out))
+        w['iterations'].append(i)
 
         # derivates for phase1 
         derror_douto = output_op - training_labels                        #predicted values - actual output values  
@@ -146,7 +148,7 @@ def testing(test_X, testing_labels, weight_hidden, weight_output):
     return results
 
 
-weights = train(train_X, training_labels, weight_hidden, weight_output, 10000)
+weights = train(train_X, training_labels, weight_hidden, weight_output, 1)
 
 w_h = weights['w_hidden']
 w_o = weights['w_output']
@@ -158,10 +160,10 @@ print(x)
 print(y)
 accuracy = results['accuracy']
 
-plt.scatter(x,y, color= "green", marker= "*", s=30)
-plt.xlabel('actual output values')
-plt.ylabel('predicted output values')
-plt.title("Accuracy " + str(accuracy) + "%")
-plt.show()
+# plt.scatter(x,y, color= "green", marker= "*", s=30)
+# plt.xlabel('actual output values')
+# plt.ylabel('predicted output values')
+# plt.title("Accuracy " + str(accuracy) + "%")
+# plt.show()
 
 
