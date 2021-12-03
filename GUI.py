@@ -18,6 +18,7 @@ root.title("Breast Cancer Evaluation")
 root.geometry('800x600')
 root.configure(bg='Black')
 
+# dataset = pd.read_csv('updated_dataset.csv')
 #Here, all the variables have been defined as integers
 clump_thickness=tk.IntVar()
 Uniformity_of_size=tk.IntVar()
@@ -29,6 +30,8 @@ chromotin = IntVar()
 nucleoli = IntVar()
 mitosis = IntVar()
 
+
+
 #This function takes input from the network and makes a scatter plot to show the accuracy
 def view_accuracy_graph():
     data3 = {'Actual Output Values': x,
@@ -37,7 +40,7 @@ def view_accuracy_graph():
     df3 = DataFrame(data3,columns=['Actual Output Values','Predicted Values'])
     figure3 = plt.Figure(figsize=(5,50), dpi=100, facecolor='black')
     ax3 = figure3.add_subplot(111)
-    ax3.scatter(df3['Actual Output Values'],df3['Predicted Values'], color = 'r')
+    ax3.scatter(df3['actual'],df3['predicted'], color = 'r')
     scatter3 = FigureCanvasTkAgg(figure3, root) 
     scatter3.get_tk_widget().place(x=50, y=10, relheight=0.8)
     ax3.set_facecolor('black')
@@ -49,10 +52,10 @@ def view_accuracy_graph():
     ax3.spines['bottom'].set_color('white') 
     ax3.spines['right'].set_color('white')        
     ax3.spines['top'].set_color('white')
-    ax3.legend(['Predicted Values']) 
-    ax3.set_xlabel('Actual Output Values')
-    ax3.set_ylabel('Predicted Values')
-    ax3.set_title('Actual Output Values Vs. Predicted Values', color= 'white')
+    ax3.legend(['predicted']) 
+    ax3.set_xlabel('actual')
+    ax3.set_ylabel('predicted')
+    ax3.set_title('actual Vs. predicted', color= 'white')
 
 
 #This function takes input from the network and makes a scatter plot to show the errors
@@ -162,3 +165,4 @@ button=tk.Button(root,text = 'View Accuracy',bg= 'Black', fg='White', command = 
 button.pack()
     
 root.mainloop()
+
