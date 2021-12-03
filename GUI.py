@@ -16,8 +16,8 @@ root.title("Breast Cancer Evaluation")
 root.geometry('800x600')
 root.configure(bg='Black')
 
-basicnn = False
-nn = True
+basicnn = True
+nn = False
 
 
 
