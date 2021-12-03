@@ -10,7 +10,9 @@ from utility_functions import *
 
 input_features = ['Clump Thickness','Uniformity of Cell Size','Uniformity of Cell Shape',	'Marginal Adhesion','Single Epithelial Cell Size',	'Bare Nuclei',	'Bland Chromatin',	'Normal Nucleoli',	'Mitoses']
 input_data = pd.DataFrame(pd.read_csv("updated_dataset.csv"), columns = input_features)
-input_data = input_data.apply(pd.to_numeric)
+# input_data = input_data.apply(pd.to_numeric)
+train_X = input_data.sample(frac = 0.8)
+test_X = input_data.drop(train_X.index)
 
 predictor_values = input_data.values
 
@@ -22,6 +24,7 @@ target_data= np.array(target_data)
 target_data.reshape(len(target_data), 1)            # converts output data to vector
 
 # number of hidden layers = 1
+
 # number of hidden nodes 2/3 times the input nodes + output nodes
 # hidden_nodes = math.floor((2/3)*len(input_features) + len(target_class))
 
