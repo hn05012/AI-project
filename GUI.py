@@ -209,7 +209,7 @@ if nn:
 
 
 elif basicnn:
-    weights = train_BNN(train_X, training_labels, 20000, 0.01)
+    weights = train_BNN(train_X, training_labels, 2000, 0.01)
     w = weights['weight']
     b = weights['bias']
     err = weights['error']
