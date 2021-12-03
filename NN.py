@@ -6,22 +6,35 @@ import pandas as pd
 import math
 import random
 from utility_functions import * 
+import matplotlib.pyplot as plt 
 
 
 input_features = ['Clump Thickness','Uniformity of Cell Size','Uniformity of Cell Shape',	'Marginal Adhesion','Single Epithelial Cell Size',	'Bare Nuclei',	'Bland Chromatin',	'Normal Nucleoli',	'Mitoses']
 input_data = pd.DataFrame(pd.read_csv("updated_dataset.csv"), columns = input_features)
-# input_data = input_data.apply(pd.to_numeric)
-train_X = input_data.sample(frac = 0.8)
-test_X = input_data.drop(train_X.index)
 
-predictor_values = input_data.values
+train_X = input_data.sample(frac = 0.6)
+test_X = input_data.drop(train_X.index)
+train_X = train_X.apply(pd.to_numeric)
+train_X = np.array(train_X.values)
+test_X = test_X.apply(pd.to_numeric)
+test_X = np.array(test_X.values)
+
 
 target_class = ["Class"]
 target_dataframe = pd.DataFrame(pd.read_csv("updated_dataset.csv"), columns=target_class)
-target_data = target_dataframe.apply(pd.to_numeric)
 
-target_data= np.array(target_data)
-target_data.reshape(len(target_data), 1)            # converts output data to vector
+train_Y = target_dataframe.sample(frac = 0.6)
+test_Y = target_dataframe.drop(train_Y.index)
+
+train_Y = train_Y.apply(pd.to_numeric)
+training_labels = np.array(train_Y.values)
+training_labels.reshape(len(train_Y.values), 1)
+
+test_Y = test_Y.apply(pd.to_numeric)
+testing_labels = np.array(test_Y.values)
+testing_labels.reshape(len(test_Y.values), 1)
+
+
 
 # number of hidden layers = 1
 
@@ -34,7 +47,7 @@ target_data.reshape(len(target_data), 1)            # converts output data to ve
 # input nodes < hidden nodes < output nodes 
 # random.seed(42)
 # hidden_nodes = random.randint(len(target_class), len(input_features), )
-hidden_nodes = 3
+hidden_nodes = 6
 
 weight_hidden = []
 
@@ -58,14 +71,16 @@ for i in range(hidden_nodes):
 weight_output = np.array(weight_output)
 
 # a low learning rate achieves minimal error rate
-lr = 0.8
 
 
 # training
-def train(weight_hidden, weight_output):
-    for epoch in range(10000):
+def train(train_X, training_labels, weight_hidden, weight_output, epoch):
+    lr = 0.01
+    bias = 0
+    w = {'w_hidden': weight_hidden, 'w_output':weight_output}
+    for i in range(epoch):
         # input for hidden layer
-        input_hidden = np.dot(predictor_values, weight_hidden)
+        input_hidden = np.dot(train_X, weight_hidden) + bias
         
         # output from hidden layer
         output_hidden = sigmoid(input_hidden)
@@ -76,11 +91,11 @@ def train(weight_hidden, weight_output):
         #output from output layer
         output_op = sigmoid(input_op)
 
-        error_out = ((1/2)*(np.power( (output_op - target_data), 2 )))
+        error_out = ((1/2)*(np.power( (output_op - training_labels), 2 )))
 
         # derivates for phase1 
-        derror_douto = output_op - target_data          #predicted values - actual output values  
-        douto_dino = sigmoid(input_op)
+        derror_douto = output_op - training_labels                        #predicted values - actual output values  
+        douto_dino = sigmoid_derivative(input_op)
         dino_dwo = output_hidden
 
         derror_dwo = np.dot(dino_dwo.T, derror_douto*douto_dino)         # dino_dwo.T takes the transpose of the matrix   
@@ -89,20 +104,64 @@ def train(weight_hidden, weight_output):
         derror_dino = derror_douto*douto_dino
         dino_douth = weight_output
         derror_douth = np.dot(derror_dino, dino_douth.T)
-        douth_dinh = sigmoid(input_hidden)
-        dinh_dwh = predictor_values
+        douth_dinh = sigmoid_derivative(input_hidden)
+        dinh_dwh = train_X
         derror_wh = np.dot(dinh_dwh.T, douth_dinh*derror_douth)
 
         #update weights
         weight_hidden -= lr*derror_wh
         weight_output -= lr*derror_dwo
+        # bias -= lr * db
+
+    w['w_hidden'] = weight_hidden
+    w['w_output'] = weight_output
+    return w
 
 
-train(weight_hidden, weight_output)
-# prediction
-record = np.array([7,6,4,4,10,5,1,1,1])
-r1 = np.dot(record, weight_hidden)
-r2 = sigmoid(r1)
-r3 = np.dot(r2, weight_output)
-r4 = sigmoid(r3)
-print(r4)
+
+
+
+def testing(test_X, testing_labels, weight_hidden, weight_output):
+    results = {'actual':[], 'predicted':[], 'accuracy':0}
+    for i in range(len(test_X)):
+        record = test_X[i]
+        r1 = np.dot(record, weight_hidden)
+        r2 = sigmoid(r1)
+        r3 = np.dot(r2, weight_output)
+        r4 = sigmoid(r3)
+        if r4 <= 0.5:
+            r4 = 0
+        else:
+            r4 = 1
+        results['predicted'].append(r4)
+    for i in range(len(testing_labels)):
+        y = int(np.extract(True, training_labels[i]))
+        results['actual'].append(y)
+    if len(results['actual']) == len(results['predicted']):
+        correct = 0
+        for i in range(len(results['actual'])):
+            if results['actual'][i] == results['predicted'][i]:
+                correct+=1
+        results['accuracy'] = (correct/len(results['actual']))*100
+    return results
+
+
+weights = train(train_X, training_labels, weight_hidden, weight_output, 10000)
+
+w_h = weights['w_hidden']
+w_o = weights['w_output']
+results = testing(test_X, testing_labels, w_h, w_o)
+    
+x = results['actual']
+y = results['predicted']
+print(x)
+print(y)
+accuracy = results['accuracy']
+
+plt.scatter(x,y, color= "green", marker= "*", s=30)
+plt.xlabel('actual output values')
+plt.ylabel('predicted output values')
+plt.title("Accuracy " + str(accuracy) + "%")
+plt.show()
+
+

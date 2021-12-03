@@ -17,7 +17,7 @@ train_X = predictor.sample(frac = 0.8)
 test_X = predictor.drop(train_X.index)
 
 train_Y = target.sample(frac = 0.8)
-test_Y = target.drop(train_X.index)
+test_Y = target.drop(train_Y.index)
 
 # converting data values to integer and storing in numpy array
 train_X = train_X.apply(pd.to_numeric)
