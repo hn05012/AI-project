@@ -34,17 +34,21 @@ testing_labels = np.array(test_Y.values)
 testing_labels = testing_labels.reshape(len(test_Y.values),1)                    
 
 
-def train(train_X, train_Y, epoch, lr):
+def train_BNN(train_X, train_Y, epoch, lr):
     np.random.seed(0)
     weights = np.random.rand(9,1)
     x = weights
     bias = np.random.rand(1)
+    errors = []
+    iterations = []
 
     for i in range(epoch):
+        iterations.append(i)
         inputs = train_X
         XW = np.dot(inputs, weights)+ bias
         z = sigmoid(XW)
         error = z - train_Y                          # predicted - actual output
+        errors.append(float(error.sum())/len(error))
         dcost = error
         dpred = sigmoid_derivative(z)
         z_del = dcost * dpred
@@ -52,11 +56,11 @@ def train(train_X, train_Y, epoch, lr):
         weights = weights - lr*np.dot(inputs, z_del)
         for num in z_del:
             bias = bias - lr*num
-    w_b = {'weight':weights, 'bias':bias, 'initial weight':x}
+    w_b = {'weight':weights, 'bias':bias, 'initial weight':x, 'error':errors, 'iterations':iterations}
     return w_b
 
                      
-def test(test_X, test_Y, weights, bias):
+def test_BNN(test_X, test_Y, weights, bias):
     results = {'actual':[], 'predicted':[], 'accuracy':0}
     
     for i in range(len(test_X)):
@@ -79,25 +83,34 @@ def test(test_X, test_Y, weights, bias):
     return results
 
 
+def predict_BNN(record, w, b):
+    result = sigmoid(np.dot(record, w) + b)
+    result = float(np.extract(True, result))
+    if result <= 0:
+        result = 0
+    else:
+        result = 1
+    return result
 
 
 
-w_b = train(train_X, training_labels, 20000, 0.55)
-weight = w_b['weight']
-bias = w_b['bias']
-results = test(test_X, testing_labels, weight, bias)
 
-x = results['actual']
-y = results['predicted']
-print(x)
-print(y)
-accuracy = results['accuracy']
+# w_b = train_BNN(train_X, training_labels, 20000, 0.55)
+# weight = w_b['weight']
+# bias = w_b['bias']
+# results = test_BNN(test_X, testing_labels, weight, bias)
 
-plt.scatter(x,y, color= "green", marker= "*", s=30)
-plt.xlabel('actual output values')
-plt.ylabel('predicted output values')
-plt.title("Accuracy " + str(accuracy) + "%")
-plt.show()
+# x = results['actual']
+# y = results['predicted']
+# print(x)
+# print(y)
+# accuracy = results['accuracy']
+
+# plt.scatter(x,y, color= "green", marker= "*", s=30)
+# plt.xlabel('actual output values')
+# plt.ylabel('predicted output values')
+# plt.title("Accuracy " + str(accuracy) + "%")
+# plt.show()
 
 
 

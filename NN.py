@@ -47,7 +47,7 @@ testing_labels.reshape(len(test_Y.values), 1)
 # input nodes < hidden nodes < output nodes 
 # random.seed(42)
 # hidden_nodes = random.randint(len(target_class), len(input_features), )
-hidden_nodes = 6
+hidden_nodes = 16
 
 weight_hidden = []
 
@@ -74,7 +74,7 @@ weight_output = np.array(weight_output)
 
 
 # training
-def train(train_X, training_labels, weight_hidden, weight_output, epoch):
+def train_NN(train_X, training_labels, weight_hidden, weight_output, epoch):
     lr = 0.01
     bias = 0
     w = {'w_hidden': weight_hidden, 'w_output':weight_output,'error':[], 'iterations':[]} 
@@ -92,7 +92,7 @@ def train(train_X, training_labels, weight_hidden, weight_output, epoch):
         output_op = sigmoid(input_op)
 
         error_out = ((1/2)*(np.power( (output_op - training_labels), 2 )))
-        w['error'].append(float(error_out.sum())/len(error_out))
+        w['error'].append(float(error_out.sum())/len(error_out))        
         w['iterations'].append(i)
 
         # derivates for phase1 
@@ -123,7 +123,7 @@ def train(train_X, training_labels, weight_hidden, weight_output, epoch):
 
 
 
-def testing(test_X, testing_labels, weight_hidden, weight_output):
+def test_NN(test_X, testing_labels, weight_hidden, weight_output):
     results = {'actual':[], 'predicted':[], 'accuracy':0}
     for i in range(len(test_X)):
         record = test_X[i]
@@ -131,6 +131,7 @@ def testing(test_X, testing_labels, weight_hidden, weight_output):
         r2 = sigmoid(r1)
         r3 = np.dot(r2, weight_output)
         r4 = sigmoid(r3)
+        r4 = float(np.extract(True, r4))
         if r4 <= 0.5:
             r4 = 0
         else:
@@ -147,18 +148,44 @@ def testing(test_X, testing_labels, weight_hidden, weight_output):
         results['accuracy'] = (correct/len(results['actual']))*100
     return results
 
+def predict_NN(record, w_h, w_o):
+    r1 = np.dot(record, w_h)
+    r2 = sigmoid(r1)
+    r3 = np.dot(r2, w_o)
+    r4 = sigmoid(r3)
+    r4 = float(np.extract(True, r4))
+    if r4 <= 0.5:
+        r4 = 0
+    else:
+        r4 = 1
+    return r4
 
-weights = train(train_X, training_labels, weight_hidden, weight_output, 1)
 
-w_h = weights['w_hidden']
-w_o = weights['w_output']
-results = testing(test_X, testing_labels, w_h, w_o)
+
+
+
+
+
+
+# weights = train(train_X, training_labels, weight_hidden, weight_output, 1000)
+
+# w_h = weights['w_hidden']
+# w_o = weights['w_output']
+# err = weights['error']
+# itr = weights['iterations']
+# plt.scatter(itr, err, color='red', marker='*', s = 0.5)
+# plt.xlabel('iterations')
+# plt.ylabel('error')
+# # plt.title("Accuracy " + str(accuracy) + "%")
+# plt.show()
+
+# results = testing(test_X, testing_labels, w_h, w_o)
     
-x = results['actual']
-y = results['predicted']
-print(x)
-print(y)
-accuracy = results['accuracy']
+# x = results['actual']
+# y = results['predicted']
+# print(x)
+# print(y)
+# accuracy = results['accuracy']
 
 # plt.scatter(x,y, color= "green", marker= "*", s=30)
 # plt.xlabel('actual output values')
