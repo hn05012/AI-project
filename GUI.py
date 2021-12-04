@@ -1,7 +1,6 @@
 import tkinter as tk
 import matplotlib.pyplot as plt
 import numpy as np
-from math import pow
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -10,14 +9,14 @@ from NN import train_NN, test_NN, predict_NN, weight_hidden, weight_output
 from BasicNN import train_BNN, test_BNN, predict_BNN
 
 
-
 root= tk.Tk()
 root.title("Breast Cancer Evaluation") 
 root.geometry('800x600')
 root.configure(bg='Black')
 
-basicnn = True
-nn = False
+# set which NN to be used
+basicnn = False
+nn = True
 
 
 
@@ -46,8 +45,8 @@ test_Y = test_Y.apply(pd.to_numeric)
 testing_labels = np.array(test_Y.values)
 testing_labels.reshape(len(test_Y.values), 1)
 
-# function call to NN train
 if nn:
+    # function call to NN train
     weights = train_NN(train_X, training_labels, weight_hidden, weight_output, 1000)
     w_h = weights['w_hidden']
     w_o = weights['w_output']
@@ -55,7 +54,7 @@ if nn:
     itr = weights['iterations']
     # function call to NN test
     results = test_NN(test_X, testing_labels, w_h, w_o)    
-    x = results['actual']
+    x = results['actual']                                   # x and y used to plot accuracy
     y = results['predicted']
     accuracy = results['accuracy']
 
@@ -215,7 +214,7 @@ elif basicnn:
     err = weights['error']
     itr = weights['iterations']
     
-    # function call to NN test
+    # function call to test NN
     results = test_BNN(test_X, testing_labels, w, b)    
     x = results['actual']
     y = results['predicted']

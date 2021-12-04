@@ -1,4 +1,4 @@
-# List of activation functions  
+
 import numpy as np 
 
 def sigmoid(x):

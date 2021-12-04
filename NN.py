@@ -3,38 +3,12 @@
 from os import error
 import numpy as np
 import pandas as pd
-import math
 import random
 from utility_functions import * 
 import matplotlib.pyplot as plt 
 
 
 input_features = ['Clump Thickness','Uniformity of Cell Size','Uniformity of Cell Shape',	'Marginal Adhesion','Single Epithelial Cell Size',	'Bare Nuclei',	'Bland Chromatin',	'Normal Nucleoli',	'Mitoses']
-input_data = pd.DataFrame(pd.read_csv("updated_dataset.csv"), columns = input_features)
-
-train_X = input_data.sample(frac = 0.6)
-test_X = input_data.drop(train_X.index)
-train_X = train_X.apply(pd.to_numeric)
-train_X = np.array(train_X.values)
-test_X = test_X.apply(pd.to_numeric)
-test_X = np.array(test_X.values)
-
-
-target_class = ["Class"]
-target_dataframe = pd.DataFrame(pd.read_csv("updated_dataset.csv"), columns=target_class)
-
-train_Y = target_dataframe.sample(frac = 0.6)
-test_Y = target_dataframe.drop(train_Y.index)
-
-train_Y = train_Y.apply(pd.to_numeric)
-training_labels = np.array(train_Y.values)
-training_labels.reshape(len(train_Y.values), 1)
-
-test_Y = test_Y.apply(pd.to_numeric)
-testing_labels = np.array(test_Y.values)
-testing_labels.reshape(len(test_Y.values), 1)
-
-
 
 # number of hidden layers = 1
 
@@ -47,7 +21,7 @@ testing_labels.reshape(len(test_Y.values), 1)
 # input nodes < hidden nodes < output nodes 
 # random.seed(42)
 # hidden_nodes = random.randint(len(target_class), len(input_features), )
-hidden_nodes = 16
+hidden_nodes = 12
 
 weight_hidden = []
 
@@ -70,17 +44,14 @@ for i in range(hidden_nodes):
     weight_output.append([round(random.uniform(0,1), 2)])
 weight_output = np.array(weight_output)
 
-# a low learning rate achieves minimal error rate
-
 
 # training
 def train_NN(train_X, training_labels, weight_hidden, weight_output, epoch):
     lr = 0.01
-    bias = 0
     w = {'w_hidden': weight_hidden, 'w_output':weight_output,'error':[], 'iterations':[]} 
     for i in range(epoch):
         # input for hidden layer
-        input_hidden = np.dot(train_X, weight_hidden) + bias
+        input_hidden = np.dot(train_X, weight_hidden)
         
         # output from hidden layer
         output_hidden = sigmoid(input_hidden)
@@ -91,10 +62,11 @@ def train_NN(train_X, training_labels, weight_hidden, weight_output, epoch):
         #output from output layer
         output_op = sigmoid(input_op)
 
-        error_out = ((1/2)*(np.power( (output_op - training_labels), 2 )))
+        error_out = ((1/2)*(np.power( (output_op - training_labels), 2 )))          # MSE = sum (1/2*(p - a))
         w['error'].append(float(error_out.sum())/len(error_out))        
         w['iterations'].append(i)
 
+        # backpropogation
         # derivates for phase1 
         derror_douto = output_op - training_labels                        #predicted values - actual output values  
         douto_dino = sigmoid_derivative(input_op)
@@ -125,7 +97,7 @@ def train_NN(train_X, training_labels, weight_hidden, weight_output, epoch):
 
 def test_NN(test_X, testing_labels, weight_hidden, weight_output):
     results = {'actual':[], 'predicted':[], 'accuracy':0}
-    for i in range(len(test_X)):
+    for i in range(len(test_X)):                                # prediction
         record = test_X[i]
         r1 = np.dot(record, weight_hidden)
         r2 = sigmoid(r1)
@@ -137,10 +109,10 @@ def test_NN(test_X, testing_labels, weight_hidden, weight_output):
         else:
             r4 = 1
         results['predicted'].append(r4)
-    for i in range(len(testing_labels)):
-        y = int(np.extract(True, training_labels[i]))
+    for i in range(len(testing_labels)):                    # actual values
+        y = int(np.extract(True, testing_labels[i]))
         results['actual'].append(y)
-    if len(results['actual']) == len(results['predicted']):
+    if len(results['actual']) == len(results['predicted']):     # comparison and accuracy
         correct = 0
         for i in range(len(results['actual'])):
             if results['actual'][i] == results['predicted'][i]:
@@ -160,37 +132,5 @@ def predict_NN(record, w_h, w_o):
         r4 = 1
     return r4
 
-
-
-
-
-
-
-
-# weights = train(train_X, training_labels, weight_hidden, weight_output, 1000)
-
-# w_h = weights['w_hidden']
-# w_o = weights['w_output']
-# err = weights['error']
-# itr = weights['iterations']
-# plt.scatter(itr, err, color='red', marker='*', s = 0.5)
-# plt.xlabel('iterations')
-# plt.ylabel('error')
-# # plt.title("Accuracy " + str(accuracy) + "%")
-# plt.show()
-
-# results = testing(test_X, testing_labels, w_h, w_o)
-    
-# x = results['actual']
-# y = results['predicted']
-# print(x)
-# print(y)
-# accuracy = results['accuracy']
-
-# plt.scatter(x,y, color= "green", marker= "*", s=30)
-# plt.xlabel('actual output values')
-# plt.ylabel('predicted output values')
-# plt.title("Accuracy " + str(accuracy) + "%")
-# plt.show()
 
 
